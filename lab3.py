@@ -13,43 +13,61 @@ text = 'Я был разбужен спозаранку Щелчком окон�
 preprocessed_text = preprocess(text)
 import numpy as np
 
+
+def get_k_gramms_entries(text: str, k: int):
+    k_gramms =  [text[i : i + k] for i in range(len(text) - k + 1)]
+    
+    n = len(k_gramms)
+    # print('n', n, k_gramms)
+    k_gramms_freq = {gramm: text.count(gramm)/n for gramm in set(k_gramms)}
+
+    return dict(sorted(k_gramms_freq.items(), key=lambda x: x[1], reverse=True))
+
+# s = 'разбиениеби'
+# example_text = preprocess(s) 
+# k_gramms_freq_dict = get_k_gramms_entries(example_text, 2)
+# # calculate_entropy_and_language_norma()
+# print(k_gramms_freq_dict)
+
+# grams = k_grams(text, k)
+# frequences = Counter()
+
+
+
 def get_k_gramms_frequency_dict(text: str):
     '''Метод для получения частотного словаря для данного текста'''
-
-    s = 'пример текста, который я буду читать завтра в 11 утра'
-    # text = preprocess(s)
-
-    # k-1 times (repeat)
-    # k = 3
+ 
     k_interval = range(1, 5+1)
     k_gramms_dict = {key: {} for key in k_interval}
 
     for k in k_interval:
-        k_gramm = set()
         gramm_dict = {}
         for bias in range(k):
-            # print(bias)
-            for i in range(bias, len(text), k):
+            for i in range(bias, len(text)-k+1, k):
                 k_gramm = text[i:i+k]
+   
                 if all(symbol in rus_alphabet for symbol in k_gramm):
                     if k_gramm not in gramm_dict: gramm_dict[k_gramm] = 1
                     else: gramm_dict[k_gramm] += 1
-                # k_gramm.add(s[i:i+k])
-                # print(s[i:i+k])
-        # print(len(k_gramm))
+                
         k_gramms_dict[k] = gramm_dict
      
     for k in k_gramms_dict:
         k_gramms_dict[k] = dict(sorted(k_gramms_dict[k].items(), key=lambda x: x[1], reverse=True))
+        n = sum(list(k_gramms_dict[k].values()))
+
+        # if k == 2: 
+            # print(f'n: {n}, dict: {k_gramms_dict[k]}')
         for key in k_gramms_dict[k]:
-            n = sum(k_gramms_dict[k].values())
+           
             frequency = k_gramms_dict[k][key]/n
             k_gramms_dict[k][key] = frequency
     
     return k_gramms_dict
 
-k_gramms_dict = get_k_gramms_frequency_dict(preprocessed_text)
+# dict_ans = get_k_gramms_frequency_dict(example_text)
 
+# print(dict_ans[2])
 # for k in k_gramms_dict:
 #     print('--------------')
 #     print(k_gramms_dict[k])
@@ -63,6 +81,7 @@ def calculate_entropy_and_language_norma(k: int, k_gramm_dict: list):
    return entropy, lang_norma
 
 
+k_gramms_dict = get_k_gramms_frequency_dict(preprocessed_text)
 
 entropy_dict = {}
 lang_norma = []

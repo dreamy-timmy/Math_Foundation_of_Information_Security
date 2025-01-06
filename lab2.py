@@ -6,6 +6,12 @@ def euclid_extended(m, a):
     x, y = y, x - m//a*y
     return d, x, y
 
+def inverse_element(m, a):
+    d, _, inverse_a = euclid_extended(m, a%m)
+    if d!=1: 
+        raise ValueError(f'{a} не обратим по модулю {m}!')
+    return inverse_a%m
+
 def inverse_element_interface():
     user_input = input("Введите элемент и модуль (через пробел), в кольце которого желаете найти обратный элемент: \n")
     a, m = map(int, user_input.split())
@@ -195,7 +201,7 @@ def decrypt(message):
         'м': 0.026, 'д': 0.025, 'п': 0.023, 'у': 0.021,
         'я': 0.018, 'ы': 0.016, 'з': 0.016, 'ъ': 0.014,
         'б': 0.014, 'г': 0.013, 'ч': 0.012, 'й': 0.010,
-        'ч': 0.009, 'ж': 0.007, 'ю': 0.006, 'ш': 0.006,
+        'x': 0.009, 'ж': 0.007, 'ю': 0.006, 'ш': 0.006,
         'ц': 0.004, 'щ': 0.003, 'э': 0.003, 'ф': 0.002,
     }
 
