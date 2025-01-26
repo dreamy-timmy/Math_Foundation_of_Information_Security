@@ -65,8 +65,8 @@ def quadratic_sieve_fact(m, a=3, b=5, c=7):
         if all(value for value in bool_values_dict[x]):
             z = x**2 - m
             sqrt = integer_sqrt(z) 
-            # print(f'x: {x}, sqrt: {sqrt}')
             if sqrt**2 == z:
+                print(f'x: {x}, y: {sqrt}')
                 y = sqrt
                 return x+y, x-y
 
@@ -86,13 +86,13 @@ def rho_fact(m, initial_1=2, initial_2=2, f = None):
     if not f:
         f = lambda x: (x**2 + 1) % m
     
+    iter = 0
     x_0_1, x_0_2 = f(initial_1), f(f(initial_2))
     x_1 = f(x_0_1)
     x_2 = f(f(x_0_2))
 
     a = abs(x_1 - x_2)
     gcd = euclid_extended(a, m)[0]
-    iter = 1
     while not (gcd > 1 and gcd < m):
         iter += 1
         x_1 = f(x_1)
@@ -100,7 +100,7 @@ def rho_fact(m, initial_1=2, initial_2=2, f = None):
 
         a = abs(x_1 - x_2)
         gcd = euclid_extended(a, m)[0]
-    
+    print(f'a: {a}, d: {gcd}')
     return gcd, m//gcd, iter
 
 def induvid_var():

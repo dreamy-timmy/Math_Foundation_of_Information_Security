@@ -39,4 +39,4 @@ Thumbs.db
 __pycache__
 files
 
-reports
+reports/*.docx

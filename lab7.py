@@ -13,7 +13,7 @@ def babyStep_giantStep(a, b, p):
     z = b*binary_modular_power(a, i, p) % p
     z_list = [z]
     y_list = [y]
-    while not [v for v in z_list if v in y_list] :
+    while not [v for v in z_list if v in y_list]:
         i += 1
         y = a**(i*k) % p
         z = b*a**i % p
@@ -21,9 +21,8 @@ def babyStep_giantStep(a, b, p):
         z_list.append(z)
     z_index = [i+1 for i in range(len(z_list)) if z_list[i] in y_list][0]
     y_index = [i+1 for i in range(len(y_list)) if y_list[i] in z_list][0]
-    # print(z_list)
-    # print(sorted(y_list))
-    # print(f'y_index: {y_index}, k: {k}, z_ind: {z_index}, length: {len(z_list)}')
+
+    print(f'y_ind: {y_index}, k: {k}, z_ind: {z_index}, общий эл-т: {y_list[y_index-1]}')
     x = y_index*k - z_index
 
     return x
@@ -36,5 +35,3 @@ def babyStep_giantStep_interface():
     x = babyStep_giantStep(a, b, p)
     print(f'Полученная степень x: {x}, проверка: b = {binary_modular_power(a, x, p)}')
 # babyStep_giantStep_interface()
-
-

@@ -39,33 +39,56 @@ def generate_rsa_keys(p, q):
 
     if gcd != 1: 
         raise ValueError('Максимальное кол-во итераций достигнуто и всё же не найдено обратного к е по mod phi')
-    return (e, n), (d, n)
+    return (e, n), (d%phi, n)
 
 
 def encrypt(open_text: str, public_key):
     e, n = public_key
     num_message = ''.join([str(mapping_dict[letter]) for letter in open_text.upper() if letter in mapping_dict])
     print(num_message)
+    block_size = n
     blocks = []
-    block = ''
-    block_length = len(str(n)) - 1
-    for i in range(len(num_message)):
-        block += num_message[i]
+    current_block = ""
 
-        if len(block) > block_length:
-            if block[0] != '0' and int(block) < n:
-                blocks.append(block)
-                block = ''
-            elif int(block) >= n:
-                blocks.append(block[:-1])
-                last_digit = block[-1]
-                block = last_digit
+    for char in num_message:
+        current_block += char
+        if current_block[0] == "0":
+            if not blocks:
+                current_block = current_block[1:]
             else:
-                prev_block = blocks.pop()  # ситуация когда 0 первый и это первый блок - невозможна
-                blocks.append(prev_block[:-1])
-                block = prev_block[-1] + block
-    if block: 
-        blocks.append(block)
+                last_value = blocks[-1][-1]
+                blocks[-1] = blocks[-1][:-1]
+                current_block = last_value + current_block
+        if int(current_block) > block_size:
+            blocks.append(current_block[:-1])
+            current_block = current_block[-1:]
+
+    if current_block:
+        if current_block[0] == "0":
+            current_block = blocks[-1][-1] + current_block
+            blocks[-1] = blocks[-1][:-1]
+        blocks.append(current_block)
+    # blocks = []
+    # block = ''
+    # block_length = len(str(n)) - 1
+    # for i in range(len(num_message)):
+    #     block += num_message[i]
+
+    #     if len(block) > block_length:
+    #         if block[0] != '0' and int(block) < n:
+    #             blocks.append(block)
+    #             block = ''
+    #         elif int(block) >= n:
+    #             blocks.append(block[:-1])
+    #             last_digit = block[-1]
+    #             block = last_digit
+    #         else:
+    #             prev_block = blocks.pop()  # ситуация когда 0 первый и это первый блок - невозможна
+    #             blocks.append(prev_block[:-1])
+    #             block = prev_block[-1] + block
+    # if block: 
+    #     blocks.append(block)
+    print(blocks)
     encrypted_message = [binary_modular_power(int(block), e, n) for block in blocks]
     
     return encrypted_message
@@ -75,23 +98,24 @@ def decrypt(cipher_text_code, private_key):
     numeric_decrypted = ''.join([str(binary_modular_power(digit, d, n)) for digit in cipher_text_code])
     decrypted_message = ''
 
-    for i in range(0, numeric_decrypted, 2):
-        number = numeric_decrypted[i:i+2]
+    for i in range(0, len(numeric_decrypted), 2):
+        number = int(numeric_decrypted[i:i+2])
         if number in reversed_mapping_dict:
             decrypted_message += reversed_mapping_dict[number]
         else:
+            print(f'list: {numeric_decrypted}, block_number: {number}, number: {number}')
             raise ValueError("Должны быть русские буквы и пробелы")
     return decrypted_message
 
 # p = 103
 # q = 239
-from sympy import isprime
+from lab5 import is_prime
 
 def p_q_input():
     print("Введите два простых числа p и q:")
     try:
         p, q = map(int, input().split())
-        if not (isprime(p) and isprime(q)):
+        if not (is_prime(p) and is_prime(q)):
             raise ValueError("Оба числа должны быть простыми!")
     except ValueError as e:
         print(f"Ошибка: {e}")
@@ -112,14 +136,14 @@ def automatic_key_generation(p, q):
 def open_keys_input(p, q):
     try:
         e = int(input("Введите значение e: "))
-        if euclid_extended(e, (p - 1) * (q - 1))[0] != 1:
+        gcd, d, _  = euclid_extended(e, (p - 1) * (q - 1))
+
+        if gcd != 1:
             raise ValueError("e и φ(n) должны быть взаимно простыми!")
-        d = euclid_extended((p - 1) * (q - 1), e)
-        if d != 1: 
-            raise ValueError('е и ф(n) не взаимно простые')
+    
         private_key = (d, p * q)
         keys.append(((e, p * q), private_key))
-        print(f"Сгенерированная пара ключей: {len(keys)}")
+        print(f"Кол-во сгенерированных пар ключей: {len(keys)}")
     except ValueError as e:
             print(f"Ошибка: {e}")
 
@@ -140,25 +164,12 @@ def encryption():
 
 def decryption():
     try:
-            ciphertext = list(map(int, input("Введите зашифрованное сообщение: ").split(', ')))
+            ciphertext = list(map(int, input("Введите зашифрованное сообщение: ").split()))
             key_number = int(input("Выберите номер ключа для дешифрования: "))
             private_key = keys[key_number - 1][1]
             decrypted_message = decrypt(ciphertext, private_key)
             print(f"Расшифрованное сообщение: {decrypted_message}")
-    except (IndexError, ValueError):
-            print("Неверный выбор ключа или некорректный ввод!")
+    except (IndexError, ValueError) as e:
+            print(f'{e}!')
 
 
-# print(encrypt('Вася молодец', (0, 22213)))
-
-# print(binary_modular_power(3, 22, 2))
-
-
-# print(ord('Я')-1030)
-
-
-
-
-# ОПРЕДЕЛЕНИЕ ЗАКРЫТОГО КЛЮЧА
-
-# расшифрование ЗАКРЫТОГО КЛЮЧА

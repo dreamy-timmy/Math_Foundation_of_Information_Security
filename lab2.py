@@ -12,6 +12,7 @@ def inverse_element(m, a):
         raise ValueError(f'{a} не обратим по модулю {m}!')
     return inverse_a%m
 
+# print(inverse_element(31552, 259))
 def inverse_element_interface():
     user_input = input("Введите элемент и модуль (через пробел), в кольце которого желаете найти обратный элемент: \n")
     a, m = map(int, user_input.split())
